@@ -1,6 +1,6 @@
 {% set name = "MatrixSwitch" %}
 {% set version = "1.0.0" %}
-{% set build = 0 %}
+{% set build = 1 %}
 {% set mpi = mpi or "nompi" %}
 
 package:
@@ -21,9 +21,11 @@ build:
   skip: True  # [win]
   script:
     - set -ex
-    - CC="$PREFIX/bin/mpicc" FC="$PREFIX/bin/mpifort"  # [mpi != 'nompi']
+    - export CC="$PREFIX/bin/mpicc" FC="$PREFIX/bin/mpifort"  # [mpi != 'nompi']
     - pushd {{ name }} && bash autogen.sh && popd
-    - {{ name }}/configure --prefix=$PREFIX
+    - LINALG_LIBS="-llapack -lblas"
+    - LINALG_LIBS="-lscalapack ${LINALG_LIBS}"  # [mpi != 'nompi']
+    - {{ name }}/configure --prefix=$PREFIX LINALG_LIBS="${LINALG_LIBS}"
     - make -j ${CPU_COUNT:-1}
     - make install
 
