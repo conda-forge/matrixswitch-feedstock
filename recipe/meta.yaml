@@ -1,6 +1,6 @@
 {% set name = "MatrixSwitch" %}
 {% set version = "1.0.0" %}
-{% set build = 1 %}
+{% set build = 2 %}
 {% set mpi = mpi or "nompi" %}
 
 package:
@@ -50,18 +50,16 @@ requirements:
     - autoconf
     - make
     - perl
+    - llvm-openmp  # [osx]
+    - libgomp  # [linux]
   host:
     - {{ mpi }}  # [mpi != 'nompi']
     - scalapack  # [mpi != 'nompi']
     - libblas
     - liblapack
-    - llvm-openmp  # [osx]
-    - libgomp  # [linux]
   run:
     - {{ mpi }}  # [mpi != 'nompi']
     - scalapack  # [mpi != 'nompi']
-    - libblas
-    - liblapack
 
 test:
   requires:
