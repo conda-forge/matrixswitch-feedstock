@@ -18,10 +18,12 @@ source:
 {% endif %}
 build:
   number: {{ build }}
-  skip: True  # [win]
+  skip: true  # [win]
   script:
     - set -ex
-    - export CC="$PREFIX/bin/mpicc" FC="$PREFIX/bin/mpifort"  # [mpi != 'nompi']
+    - export FFLAGS="${FFLAGS} -fallow-argument-mismatch"  # [linux or (osx and arm64)]
+    - export OPAL_PREFIX=$PREFIX  # [mpi == 'openmpi']
+    - export CC="mpicc" FC="mpifort"  # [mpi != 'nompi']
     - pushd {{ name }} && bash autogen.sh && popd
     - LINALG_LIBS="-llapack -lblas"
     - LINALG_LIBS="-lscalapack ${LINALG_LIBS}"  # [mpi != 'nompi']
@@ -36,9 +38,10 @@ build:
   {% endif %}
   string: "{{ mpi_prefix }}_h{{ PKG_HASH }}_{{ build }}"
 
-  {% if mpi != "nompi" %}
   run_exports:
-    - {{ name }} * {{ mpi_prefix }}_*
+    - {{ pin_subpackage('matrixswitch', max_pin='x.x') }}
+  {% if mpi != "nompi" %}
+    - {{ name|lower }} * {{ mpi_prefix }}_*
   {% endif %}
 
 requirements:
@@ -48,10 +51,12 @@ requirements:
     - libtool
     - automake
     - autoconf
+    - gnuconfig  # [unix]
     - make
     - perl
     - llvm-openmp  # [osx]
     - libgomp  # [linux]
+    - {{ mpi }}  # [mpi == "openmpi" and build_platform != target_platform]
   host:
     - {{ mpi }}  # [mpi != 'nompi']
     - scalapack  # [mpi != 'nompi']
