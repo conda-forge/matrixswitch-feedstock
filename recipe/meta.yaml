@@ -1,6 +1,6 @@
 {% set name = "MatrixSwitch" %}
 {% set version = "1.0.0" %}
-{% set build = 2 %}
+{% set build = 3 %}
 {% set mpi = mpi or "nompi" %}
 
 package:
@@ -44,6 +44,7 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
+    - {{ stdlib("c") }}
     - {{ compiler('fortran') }}
     - libtool
     - automake
