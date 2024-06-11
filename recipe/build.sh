@@ -7,7 +7,7 @@ if [[ "$mpi" != "nompi" ]]; then
   export FC=mpifort
   LINALG_LIBS="-lscalapack ${LINALG_LIBS}"
   export FFLAGS="-I$PREFIX/include ${FFLAGS} -fallow-argument-mismatch"
-  export OMPI_FCFLAGS="${FFLAGS}"
+  export FCFLAGS=$FFLAGS
 fi
 
 cd MatrixSwitch
