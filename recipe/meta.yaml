@@ -1,12 +1,11 @@
 {% set name = "MatrixSwitch" %}
 {% set version = "1.0.0" %}
-{% set build = 2 %}
+{% set build = 3 %}
 {% set mpi = mpi or "nompi" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
-
 source:
   url: https://gitlab.com/ElectronicStructureLibrary/omm-bundle/-/archive/v{{ version }}/omm-bundle-v{{ version }}.tar.gz
   sha256: 815f849d4a603383e6553db4e97fe695882b40e4bbc6f33577bc2556166949af
@@ -18,16 +17,7 @@ source:
 {% endif %}
 build:
   number: {{ build }}
-  skip: True  # [win]
-  script:
-    - set -ex
-    - export CC="$PREFIX/bin/mpicc" FC="$PREFIX/bin/mpifort"  # [mpi != 'nompi']
-    - pushd {{ name }} && bash autogen.sh && popd
-    - LINALG_LIBS="-llapack -lblas"
-    - LINALG_LIBS="-lscalapack ${LINALG_LIBS}"  # [mpi != 'nompi']
-    - {{ name }}/configure --prefix=$PREFIX LINALG_LIBS="${LINALG_LIBS}"
-    - make -j ${CPU_COUNT:-1}
-    - make install
+  skip: true  # [win]
 
   {% if mpi != "nompi" %}
   {% set mpi_prefix = "mpi_" + mpi %}
@@ -44,6 +34,7 @@ build:
 requirements:
   build:
     - {{ compiler('c') }}
+    - {{ stdlib("c") }}
     - {{ compiler('fortran') }}
     - libtool
     - automake
@@ -57,9 +48,6 @@ requirements:
     - scalapack  # [mpi != 'nompi']
     - libblas
     - liblapack
-  run:
-    - {{ mpi }}  # [mpi != 'nompi']
-    - scalapack  # [mpi != 'nompi']
 
 test:
   requires:
