@@ -1,6 +1,6 @@
 {% set name = "MatrixSwitch" %}
 {% set version = "1.0.0" %}
-{% set build = 3 %}
+{% set build = 4 %}
 {% set mpi = mpi or "nompi" %}
 
 package:
